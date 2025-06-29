@@ -31,7 +31,7 @@
           <a class="nav-link" href="../HTML/login.html">Login</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" href="dependentes.php">Cadastro Dependentes</a>
+          <a class="nav-link" href="dependente.php">Cadastro Dependentes</a>
         </li>
         <li class="nav-item">
             <a class="nav-link" href="despesa.php">Despesas</a>
@@ -84,15 +84,20 @@ include 'conexao.php';
 
         $nomeDependente = $pegaDependente['nome_dependente'];
         $relacaoDependente = $pegaDependente['relacao'];
+        $idDependente = $pegaDependente['id_dependente'];
     
     echo"
-        <li class='list-group-item' style = 'text-align: center;' >$nomeDependente - $relacaoDependente
-        <img src='https://cdn-icons-png.flaticon.com/512/1214/1214428.png' 
-            alt='Excluir' 
-            class='icon-excluir' 
-            style='cursor:pointer; width:24px; height:24px;' 
-            onclick='confirmarExclusao(this)'>
-        </li>
+     <li class='list-group-item' style='text-align: center;'>$nomeDependente - $relacaoDependente
+      <form id='form-excluir-$idDependente' action='excluiDependente.php' method='POST' style='display:inline;'>
+        <input type='hidden' name='idDependente' value='$idDependente'>
+        <button type='button' style='border:none; background:none; padding:0; cursor:pointer;' onclick='confirmarExclusao($idDependente);'>
+            <img src='https://cdn-icons-png.flaticon.com/512/1214/1214428.png' 
+                alt='Excluir' 
+                class='icon-excluir' 
+                style='width:24px; height:24px;'>
+        </button>
+      </form>
+    </li>
     ";
     }
 ?>
@@ -101,16 +106,15 @@ include 'conexao.php';
       </div>
     </div>
   </main>
-
+  
   <script>
-    function confirmarExclusao(elemento) {
-      if (confirm("Tem certeza que deseja excluir este dependente?")) {
-        const itemLista = elemento.closest("li");
-        itemLista.remove();
-      }
+    function confirmarExclusao(idDependente) {
+        if (confirm("Tem certeza que deseja excluir este dependente?")) {
+            // Enviar o formulário correspondente
+            document.getElementById('form-excluir-' + idDependente).submit();
+        }
     }
   </script>
-  
    <!-- Bootstrap JS -->
    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 

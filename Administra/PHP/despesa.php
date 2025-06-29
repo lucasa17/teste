@@ -56,78 +56,99 @@ include 'conexao.php';
   echo"
     <div class='container mt-4'>
     <div class='form-section bg-white p-4 rounded shadow-sm'>
-    <h3>Cadastrar Dívida</h3>
+    <h3>Cadastrar Despesa</h3>
 
-    <form class='form' action='../PHP/cadastrarDespesa.php' method='post'>
+    <form class='form' action='../PHP/cadastraDespesa.php' method='post'>
       <label for='despesa' class='mt-3'>Nome da Despesa:</label>
       <input type='text' name='txtnomedespesa' id='despesa' class='form-control' rows='3' placeholder='Digite a despesa'></input>
 
     <label for='Dependente'>Dependente:</label>
-    <select name='txtdependente' id='dependente' class='form-select' required>
+    <select name='txtdependente' id='dependente' class='form-select'>
       <option value=''>--Selecione--</option>
   ";
 	  $dependentes = "SELECT * from dependente where fk_usuario = $id order by nome_dependente asc";
-    $queryDependete = mysqli_query($conn, $dependentes);
+    $queryDependente = mysqli_query($conn, $dependentes);
 
-    while($pegaDependente = mysqli_fetch_assoc($queryDependete)){
+    while($pegaDependente = mysqli_fetch_assoc($queryDependente)){
 
     $nomeDependente = $pegaDependente['nome_dependente'];
+    $idDependente = $pegaDependente['id_dependente'];
 
     echo"
-        <option value='$nomeDependente'>$nomeDependente</option>
+        <option value='$idDependente'>$nomeDependente</option>
     ";
     }
     echo"
         </select>
         <label for='categoria' class='mt-3'>Categoria:</label>
-        <select name='txtcategoria' id='categoria' class='form-select' required>
+        <select name='txtCategoria' id='categoria' class='form-select' required>
           <option value=''>--Selecione--</option>
     ";
 
-    $categoria = "SELECT * from categoria where fk_usuario = $id order by nome_categoria asc";
+    $categoria = "SELECT * from categoria where fk_usuario = $id or fk_usuario is null order by nome_categoria asc";
+
     $queryCategoria = mysqli_query($conn, $categoria);
 
     while($pegaCategoria = mysqli_fetch_assoc($queryCategoria)){
 
     $nomeCategoria = $pegaCategoria['nome_categoria'];
+    $idCategoria = $pegaCategoria['id_categoria'];
 
     echo"
-        <option value='$nomeCategoria'>$nomeCategoria</option>
+        <option value='$idCategoria'>$nomeCategoria</option>
     ";
     }
+
     echo"
           <option value='Outra'>Outra...</option>
         </select>
 
         <div id='novaCategoriaWrapper' class='mt-2' style='display: none;'>
           <label for='novaCategoria'>Digite a nova categoria:</label>
-          <input type='text' id='novaCategoria' class='form-control' placeholder='Ex: Educação, Saúde...' />
+          <input type='text' name='txtNovaCategoria' id='novaCategoria' class='form-control' placeholder='Ex: Educação, Saúde...' />
         </div>
+    ";
 
+    
+    echo"
         <label for='tipoPagamento' class='mt-3'>Tipo de Pagamento:</label>
-        <select id='tipoPagamento' class='form-select' required>
+        <select name='txtTipoPagamento' id='tipoPagamento' class='form-select' required>
           <option value=''>--Selecione--</option>
-          <option value='Pix'>Pix</option>
-          <option value='Dinheiro'>Dinheiro</option>
-          <option value='Cartão Débito'>Cartão Débito</option>
-          <option value='Cartão Crédito'>Cartão Crédito</option>
-          <option value='Cheque'>Cheque</option>
+    ";
+
+    $tipoPagamento = "SELECT * from tipopagamento where fk_usuario = $id or fk_usuario is null order by nome_pagamento asc";
+
+    $queryPagamento = mysqli_query($conn, $tipoPagamento);
+
+    while($pegaPagamento = mysqli_fetch_assoc($queryPagamento)){
+
+    $nomePagamento= $pegaPagamento['nome_pagamento'];
+    $idPagamento = $pegaPagamento['id_pagamento'];
+
+    echo"
+        <option value='$idPagamento'>$nomePagamento</option>
+    ";
+    }
+
+    echo"
           <option value='Outro'>Outro...</option>
         </select>
 
         <div id='novoTipoWrapper' class='mt-2' style='display: none;'>
           <label for='novoTipo'>Digite o novo tipo de pagamento:</label>
-          <input type='text' id='novoTipo' class='form-control' placeholder='Ex: Transferência Internacional' />
+          <input type='text' name='txtNovoTipoPagamento' id='novoTipo' class='form-control' placeholder='Ex: Transferência Internacional' />
         </div>
+    ";
 
+    echo"
         <label for='valor' class='mt-3'>Valor total (R$):</label>
-        <input type='number' id='valor' class='form-control' min='0' step='0.01' required />
+        <input type='number' name='numValor' id='valor' class='form-control' min='0' step='0.01' required />
 
         <label for='parcelas' class='mt-3'>Número de parcelas:</label>
-        <input type='number' id='parcelas' class='form-control' min='1' required />
+        <input type='number' name='numParcelas' id='parcelas' class='form-control' min='1' required />
 
         <label for='data' class='mt-3'>Data inicial do gasto:</label>
-        <input type='date' id='data' class='form-control' required />
+        <input type='date' name='txtData' id='data' class='form-control'/>
 
         <button type='submit' class='btn btn-success mt-4'>Salvar Gasto</button>
       </form>
@@ -136,6 +157,35 @@ include 'conexao.php';
 ";
 
 ?>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const selectCategoria = document.querySelector('select[name="txtCategoria"]');
+    const inputNovaCategoria = document.querySelector('input[name="txtNovaCategoria"]');
+
+    if (selectCategoria && inputNovaCategoria) {
+        selectCategoria.addEventListener('change', function () {
+            // Sempre que o usuário mudar a categoria selecionada,
+            // limpamos o campo de nova categoria.
+            inputNovaCategoria.value = '';
+        });
+    }
+});
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const selectPagameto = document.querySelector('select[name="txtTipoPagamento"]');
+    const inputNovoPagamento = document.querySelector('input[name="txtNovoTipoPagamento"]');
+
+    if (selectPagameto && inputNovoPagamento) {
+        selectPagameto.addEventListener('change', function () {
+            // Sempre que o usuário mudar a categoria selecionada,
+            // limpamos o campo de nova categoria.
+            inputNovoPagamento.value = '';
+        });
+    }
+});
+</script>
 
  <!-- Bootstrap JS -->
  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
