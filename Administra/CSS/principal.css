@@ -85,10 +85,29 @@ th {
   background-color: #eee;
 }
 
+/* h3 */
+.cadastro-login {
+    font-size: 14px;
+    line-height: 0.2;
+}
+
 /* Footer */
 footer {
   background-color: #003366 !important;
   color: white;
   padding: 2rem 0;
   margin-bottom: auto;
+}
+
+.form-section {
+  max-height: 550px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.form-section canvas {
+  flex-grow: 1;
+  height: 100% !important;
+  max-height: 450px;
 }
