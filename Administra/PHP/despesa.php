@@ -247,9 +247,8 @@ if(empty($_SESSION['ID_USER'])){
 
 
 <?php
-$selectDespesas = "SELECT d.*, dep.nome_dependente, cat.nome_categoria, tp.nome_pagamento
+$selectDespesas = "SELECT d.*, cat.nome_categoria, tp.nome_pagamento
                    FROM despesa d
-                   LEFT JOIN dependente dep ON d.fk_dependente = dep.id_dependente
                    LEFT JOIN categoria cat ON d.fk_categoria = cat.id_categoria
                    LEFT JOIN tipopagamento tp ON d.fk_tipo_pagamento = tp.id_pagamento
                    WHERE d.fk_usuario = $id

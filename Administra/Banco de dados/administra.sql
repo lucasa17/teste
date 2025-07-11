@@ -22,9 +22,12 @@ insert into TipoPagamento (nome_pagamento) values ('Pix'),('Dinheiro'),('Cartão
 CREATE TABLE FonteRenda(
 	id_renda INT AUTO_INCREMENT PRIMARY KEY,
 	fonte_da_renda VARCHAR(100) NOT NULL,
-	fk_usuario INT NOT NULL,
+	fk_usuario INT,
 	FOREIGN KEY (fk_usuario) REFERENCES Usuario(id_usuario)  ON DELETE CASCADE ON UPDATE CASCADE
 );
+
+insert into FonteRenda (fonte_da_renda) values ('Salário');
+
 -- Categorias das despesas e divídas
 CREATE TABLE Categoria(
 	id_categoria INT AUTO_INCREMENT PRIMARY KEY,
@@ -120,7 +123,7 @@ CREATE TABLE ResumoMensal (
   saldo DECIMAL(10,2),
   saldo_meta DECIMAL(10,2),
   fk_usuario INT,
-  UNIQUE (ano, mes)
+  UNIQUE (mes)
 );
 -- Tabela de Relatório anual
 CREATE TABLE RelatorioAnual (
@@ -133,3 +136,4 @@ CREATE TABLE RelatorioAnual (
     UNIQUE (ano),
     FOREIGN KEY (fk_usuario) REFERENCES Usuario(id_usuario) ON DELETE CASCADE ON UPDATE CASCADE
 );
+

@@ -121,7 +121,7 @@ if(empty($_SESSION['ID_USER'])){
   </div>
   ";
 
-  $queryFonte = mysqli_query($conn, "SELECT * FROM FonteRenda WHERE fk_usuario = $id OR fk_usuario IS NULL ORDER BY fonte_da_renda ASC");
+  $queryFonte = mysqli_query($conn, "SELECT * FROM FonteRenda WHERE fk_usuario = $id ORDER BY fonte_da_renda ASC");
 
   echo "
   <div class='container mt-4'>
@@ -147,7 +147,7 @@ echo "
     <td class='text-center'>$nomeRenda</td>
     <td class='text-center'>
       <form action='excluiFonteRenda.php' method='POST' style='display:inline;'>
-        <input type='hidden' name='idRenda' value='$idFonte'>
+        <input type='hidden' name='idFonte' value='$idFonte'>
         <button type='submit' class='btn btn-danger btn-sm'>Excluir</button>
       </form>
     </td>
