@@ -1,6 +1,7 @@
     <?php
   session_start();
   include 'conexao.php';
+  mysqli_set_charset($conn, 'utf8');
 
     if(empty($_SESSION['ID_USER'])){
 
@@ -8,7 +9,7 @@
           <div id='loadingOverlay'>
               <div id='loadingCard'>
               <h1>Administra</h1>
-              <img src='https://cdn.dribbble.com/users/2469324/screenshots/6538803/comp_3.gif' alt='Carregando...' />
+              <img src='../IMAGENS/alerta.gif' alt='Carregando...' />
               <strong><p class='mt-3'>Usuário não esta logado</p></strong>
               </div>
           </div>
@@ -19,10 +20,10 @@
   ?>
     
     <!DOCTYPE html>
-  <html lang="pt-BR">
+<html lang="pt-BR">
   <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Administra - Visão Geral</title>
 
     <!-- Bootstrap CSS -->
@@ -76,32 +77,48 @@
   <?php
     $id = $_SESSION['ID_USER'];
 
-      $anoAtual = date('Y');
-
+      $anoAtual = date('Y'); // Corrige a variável não definida
       $meses = [
-          1 => "Jan", 2 => "Fev", 3 => "Mar", 4 => "Abr", 5 => "Mai", 6 => "Jun",
-          7 => "Jul", 8 => "Ago", 9 => "Set", 10 => "Out", 11 => "Nov", 12 => "Dez"
+        1 => 'Jan', 2 => 'Fev', 3 => 'Mar', 4 => 'Abr', 5 => 'Mai', 6 => 'Jun',
+        7 => 'Jul', 8 => 'Ago', 9 => 'Set', 10 => 'Out', 11 => 'Nov', 12 => 'Dez'
       ];
 
-      $labelsMeses = [];
-      $receitas = [];
-      $despesas = [];
-      $saldos = [];
+      $mesAtual = date('n'); // Número do mês atual (1-12)
 
-      for ($mes = 1; $mes <= 12; $mes++) {
-          $labelsMeses[] = $meses[$mes];
+      $labelsMeses = [$meses[$mesAtual]];
 
-          $sql = "SELECT total_receita, total_despesa, saldo 
-                  FROM ResumoMensal 
-                  WHERE fk_usuario = $id AND mes = $mes AND ano = $anoAtual";
+      $sql = "SELECT total_receita, total_despesa, saldo 
+              FROM ResumoMensal 
+              WHERE fk_usuario = $id AND mes = $mesAtual AND ano = $anoAtual";
 
-          $res = mysqli_query($conn, $sql);
-          $dados = mysqli_fetch_assoc($res);
+      $res = mysqli_query($conn, $sql);
+      $dados = mysqli_fetch_assoc($res);
 
-          $receitas[] = isset($dados['total_receita']) ? floatval($dados['total_receita']) : 0;
-          $despesas[] = isset($dados['total_despesa']) ? floatval($dados['total_despesa']) : 0;
-          $saldos[] = isset($dados['saldo']) ? floatval($dados['saldo']) : 0;
-      }
+      $receitas = [isset($dados['total_receita']) ? floatval($dados['total_receita']) : 0];
+      $despesas = [isset($dados['total_despesa']) ? floatval($dados['total_despesa']) : 0];
+      $saldos = [isset($dados['saldo']) ? floatval($dados['saldo']) : 0];
+
+        $dadosPorAno = [];
+        $gastosPorAno = [];
+
+        $anosDisponiveis = [2025, 2024, 2023]; // ou busque dinamicamente do banco
+
+        foreach ($anosDisponiveis as $ano) {
+            $dadosPorAno[$ano] = array_fill(0, 12, 0);
+            $gastosPorAno[$ano] = array_fill(0, 12, 0);
+
+            $sql = "SELECT mes, total_receita, total_despesa 
+                    FROM ResumoMensal 
+                    WHERE fk_usuario = $id AND ano = $ano";
+
+            $res = mysqli_query($conn, $sql);
+
+            while ($row = mysqli_fetch_assoc($res)) {
+                $indice = intval($row['mes']) - 1;
+                $dadosPorAno[$ano][$indice] = floatval($row['total_receita']);
+                $gastosPorAno[$ano][$indice] = -1 * floatval($row['total_despesa']);
+            }
+        }
   ?>
   <!-- VISÃO GERAL -->
   <!-- grafico de analise mensal-->
@@ -345,6 +362,11 @@
     </script>
 
     <script>
+      const dadosPorAno = <?php echo json_encode($dadosPorAno); ?>;
+      const gastosPorAno = <?php echo json_encode($gastosPorAno); ?>;
+    </script>
+
+    <script>
       const rendaLabels = <?php echo json_encode($rendaLabels); ?>;
       const rendaValores = <?php echo json_encode($rendaValores); ?>;
     </script>
@@ -412,20 +434,9 @@
 
       // Gráfico Anual
       const ctxAnual = document.getElementById('graficoAnual').getContext('2d');
-      const dadosPorAno = {
-        2025: [5000, 4800, 4900, 5100, 5200, 5200, 0, 0, 0, 0, 0, 0],
-        2024: [4000, 4100, 4200, 4300, 4400, 4500, 4600, 4700, 4800, 4900, 5000, 5100],
-        2023: [3000, 3200, 3300, 3400, 3500, 3600, 3700, 3800, 3900, 4000, 4100, 4200]
-      };
-
-      const gastosPorAno = {
-        2025: [3000, 3200, 3100, 3400, 3500, 3300, 0, 0, 0, 0, 0, 0],
-        2024: [2500, 2600, 2700, 2800, 2900, 3000, 3100, 3200, 3300, 3400, 3500, 3600],
-        2023: [2000, 2100, 2200, 2300, 2400, 2500, 2600, 2700, 2800, 2900, 3000, 3100]
-      };
 
       const graficoAnual = new Chart(ctxAnual, {
-    type: 'line',
+    type: 'bar',
     data: {
       labels: ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'],
       datasets: [

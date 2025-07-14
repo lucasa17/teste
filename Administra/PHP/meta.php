@@ -1,6 +1,7 @@
 <?php
 session_start();
 include 'conexao.php';
+mysqli_set_charset($conn, 'utf8');
 
 if(empty($_SESSION['ID_USER'])){
 
@@ -8,7 +9,7 @@ if(empty($_SESSION['ID_USER'])){
       <div id='loadingOverlay'>
           <div id='loadingCard'>
           <h1>Administra</h1>
-          <img src='https://cdn.dribbble.com/users/2469324/screenshots/6538803/comp_3.gif' alt='Carregando...' />
+          <img src='../IMAGENS/alerta.gif' alt='Carregando...' />
           <strong><p class='mt-3'>Usuário não esta logado</p></strong>
           </div>
       </div>

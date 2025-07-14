@@ -1,6 +1,7 @@
 <?php
 session_start();
 include 'conexao.php';
+  mysqli_set_charset($conn, 'utf8');
 
 if(empty($_SESSION['ID_USER'])){
 
@@ -8,14 +9,14 @@ if(empty($_SESSION['ID_USER'])){
       <div id='loadingOverlay'>
           <div id='loadingCard'>
           <h1>Administra</h1>
-          <img src='https://cdn.dribbble.com/users/2469324/screenshots/6538803/comp_3.gif' alt='Carregando...' />
+          <img src='../IMAGENS/alerta.gif' alt='Carregando...' />
           <strong><p class='mt-3'>Usuário não esta logado</p></strong>
           </div>
       </div>
       ";        
   header("refresh: 3.5; url=../index.html");
 }
-  
+
 ?>
 
 <!DOCTYPE html>
@@ -73,7 +74,6 @@ if(empty($_SESSION['ID_USER'])){
         </li>
       </ul>
     </div>
-  </div>
 </nav>
 
 <?php
@@ -92,6 +92,7 @@ if(empty($_SESSION['ID_USER'])){
     <select name='txtdependente' id='dependente' class='form-select'>
       <option value=''>Nenhum</option>
   ";
+
 	  $dependentes = "SELECT * from dependente where fk_usuario = $id order by nome_dependente asc";
     $queryDependente = mysqli_query($conn, $dependentes);
 
@@ -160,24 +161,27 @@ if(empty($_SESSION['ID_USER'])){
           <option value='Outro'>Outro...</option>
         </select>
 
-      <div id='novoTipoWrapper' class='mt-2' style='display: none;'>
-        <label for='novoTipo'>Digite o novo tipo de pagamento:</label>
-        <input type='text' name='txtNovoTipoPagamento' id='novoTipo' class='form-control' placeholder='Ex: Transferência Internacional' />
-      </div>
+        <div id='novoTipoWrapper' class='mt-2' style='display: none;'>
+          <label for='novoTipo'>Digite o novo tipo de pagamento:</label>
+          <input type='text' name='txtNovoTipoPagamento' id='novoTipo' class='form-control' placeholder='Ex: Transferência Internacional' />
+        </div>
+    ";
 
-      <label for='valor' class='mt-3'>Valor total (R$):</label>
-      <input type='number' name='numValor' id='valor' class='form-control' min='0' step='0.01' required />
+echo "
+  <label for='valor' class='mt-3'>Valor total (R$):</label>
+  <input type='number' name='numValor' id='valor' class='form-control' min='0' step='0.01' required />
 
-      <label for='data' class='mt-3'>Data inicial do gasto:</label>
-      <input type='date' name='txtData' id='data' class='form-control'/>
+  <label for='data' class='mt-3'>Data inicial do gasto:</label>
+  <input type='date' name='txtData' id='data' class='form-control' required />
 
-      <button type='submit' class='btn btn-success mt-4'>Salvar Gasto</button>
-    </form>
+  <button type='submit' class='btn btn-success mt-4'>Salvar Gasto</button>
+</form>
+</div>
 ";
 
 ?>
+    </div>
 
-<hr>
 
 <!-- Filtro de dívidas -->
 <div class="container mt-4">
@@ -205,7 +209,10 @@ if(empty($_SESSION['ID_USER'])){
 
           <?php
           // Buscar categorias do usuário para popular o select
-          $categorias = mysqli_query($conn, "SELECT id_categoria, nome_categoria FROM categoria WHERE fk_usuario = $id OR fk_usuario IS NULL ORDER BY nome_categoria ASC");
+
+          $categoriaSel = "SELECT id_categoria, nome_categoria FROM categoria WHERE fk_usuario = $id OR fk_usuario IS NULL ORDER BY nome_categoria ASC";
+
+          $categorias = mysqli_query($conn,$categoriaSel);
           while ($cat = mysqli_fetch_assoc($categorias)) {
             echo "<option value='{$cat['id_categoria']}'>{$cat['nome_categoria']}</option>";
           }
@@ -243,7 +250,6 @@ if(empty($_SESSION['ID_USER'])){
     </form>
   </div>
 </div>
-<hr>
 
 
 <?php
